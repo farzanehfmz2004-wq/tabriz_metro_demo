@@ -17,7 +17,7 @@ st.set_page_config(
 )
 
 # >>> نام تیم خودتان را بین دو گیومه بنویسید <<<
-TEAM_NAME ="فرزانه فرامرزی و معصومه موسی پور"
+TEAM_NAME = "نام تیم شما"
 
 # ----------------------------------------------------------------------
 # داده‌ها (همه هاردکد؛ مختصات تقریبی و فقط برای نمایش روی نقشه)
@@ -134,6 +134,27 @@ table.cal td.free { background: #0E7C86; color: #fff; font-weight: 600; }
 table.cal td.today { outline: 3px solid #F5A623; }
 table.cal td.empty { background: transparent; }
 table.cal td small { display: block; font-size: .65rem; margin-top: 2px; }
+/* مخفی کردن نوار ابزار بالای صفحه (گیت‌هاب، ویرایش، منو) */
+[data-testid="stToolbar"], [data-testid="stAppDeployButton"], [data-testid="stMainMenu"],
+[data-testid="stDecoration"], [data-testid="stStatusWidget"], #MainMenu, footer {
+    display: none !important;
+}
+[data-testid="stHeader"] { background: transparent; }
+
+/* ریسپانسیو عمومی */
+.stApp { overflow-x: hidden; }
+.hero h2 { font-size: clamp(1.2rem, 3.2vw, 1.8rem); }
+.hero p { font-size: clamp(.8rem, 1.8vw, 1rem); }
+table.cal { table-layout: fixed; }
+[data-testid="stMetricValue"] > div {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+@media (min-width: 769px) and (max-width: 1100px) {
+    .block-container { padding: 1.5rem 1.5rem 2rem 1.5rem; }
+}
+
 /* موبایل و صفحه‌های کوچک */
 @media (max-width: 768px) {
     .block-container { padding: 1rem .8rem 2rem .8rem; }
@@ -339,9 +360,9 @@ def page_map():
         st.markdown('<span id="maplayout"></span>', unsafe_allow_html=True)
         m = build_map(selected)
         try:
-            st_folium(m, height=560, use_container_width=True, returned_objects=[], key="metro_map")
+            st_folium(m, height=500, use_container_width=True, returned_objects=[], key="metro_map")
         except TypeError:
-            st_folium(m, height=560, width=900, returned_objects=[], key="metro_map")
+            st_folium(m, height=500, width=900, returned_objects=[], key="metro_map")
 
 
 # ----------------------------------------------------------------------
