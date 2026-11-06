@@ -16,11 +16,14 @@ st.set_page_config(
     layout="wide",
 )
 
+# >>> نام تیم خودتان را بین دو گیومه بنویسید <<<
+TEAM_NAME = "نام تیم شما"
+
 # ----------------------------------------------------------------------
 # داده‌ها (همه هاردکد؛ مختصات تقریبی و فقط برای نمایش روی نقشه)
 # ----------------------------------------------------------------------
 STATIONS = [
-    ("ایلگلی", 38.0705, 46.3720),
+    ("ائل‌گلی", 38.0705, 46.3720),
     ("سهند", 38.0695, 46.3600),
     ("امام رضا", 38.0705, 46.3480),
     ("خیام", 38.0720, 46.3380),
@@ -131,6 +134,27 @@ table.cal td.free { background: #0E7C86; color: #fff; font-weight: 600; }
 table.cal td.today { outline: 3px solid #F5A623; }
 table.cal td.empty { background: transparent; }
 table.cal td small { display: block; font-size: .65rem; margin-top: 2px; }
+/* موبایل و صفحه‌های کوچک */
+@media (max-width: 768px) {
+    .block-container { padding: 1rem .8rem 2rem .8rem; }
+    .hero { padding: 1rem 1.1rem; border-radius: 12px; }
+    .hero h2 { font-size: 1.3rem; }
+    .hero p { font-size: .85rem; }
+    [data-testid="stMetric"] { padding: .6rem .7rem; }
+    [data-testid="stMetricValue"] { font-size: 1.3rem; }
+    [data-testid="stMetricLabel"] { font-size: .8rem; }
+    div[data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) { flex-wrap: wrap; gap: .6rem; }
+    div[data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) > div {
+        min-width: calc(50% - .6rem) !important;
+        flex: 1 1 calc(50% - .6rem) !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(#maplayout) { flex-direction: column-reverse; }
+    iframe { max-width: 100%; }
+    table.cal { border-spacing: 3px; }
+    table.cal th { font-size: .62rem; padding: .35rem .1rem; }
+    table.cal td { height: 46px; padding: .3rem .1rem; font-size: .8rem; }
+    table.cal td small { font-size: .5rem; }
+}
 </style>
 """
 
@@ -312,6 +336,7 @@ def page_map():
     selected = NAMES.index(choice) if choice in NAMES else None
 
     with col_map:
+        st.markdown('<span id="maplayout"></span>', unsafe_allow_html=True)
         m = build_map(selected)
         try:
             st_folium(m, height=560, use_container_width=True, returned_objects=[], key="metro_map")
@@ -419,10 +444,9 @@ def page_crowd():
 # ----------------------------------------------------------------------
 def page_about():
     hero("تماس با ما / درباره", "درباره‌ی پروژه و تیم")
+    st.markdown("**نام تیم:** " + TEAM_NAME)
     st.markdown(
         """
-**نام تیم:** تیم مترو‌یار (نام نمونه؛ نام تیم خودتان را اینجا بنویسید)
-
 **درباره پروژه:** این برنامه یک دمو از «دستیار سفر با مترو تبریز (خط ۱)» است که با پایتون و Streamlit ساخته شده
 و شامل برنامه سفر، نقشه، تقویم روزهای رایگان و نمودار شلوغی است.
 
