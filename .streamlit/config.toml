@@ -4,9 +4,3 @@ primaryColor = "#0E7C86"
 backgroundColor = "#F5FAFB"
 secondaryBackgroundColor = "#E3F1F3"
 textColor = "#0B2545"
-
-[client]
-toolbarMode = "minimal"
-
-[browser]
-gatherUsageStats = false
