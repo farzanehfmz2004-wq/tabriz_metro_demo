@@ -33,7 +33,7 @@ st.set_page_config(
 )
 
 # >>> نام تیم خودتان را بین دو گیومه بنویسید <<<
-TEAM_NAME = "فرزانه فرامرزی "
+TEAM_NAME = "نام تیم شما"
 
 # ----------------------------------------------------------------------
 # داده‌ها (همه داخل کد؛ مختصات تقریبی است)
@@ -138,16 +138,30 @@ def html(s):
     st.markdown(s, unsafe_allow_html=True)
 
 
-def banner(key, title, subtitle):
+_WIN = "".join('<rect x="%d" y="26" width="26" height="16" rx="4" fill="#0B2545" fill-opacity=".85"/>' % (20 + 36 * i)
+               for i in range(5))
+_WHL = "".join('<circle cx="%d" cy="76" r="7" fill="#0B2545"/>' % x for x in (40, 90, 150, 190))
+TRAIN_ART = (
+    '<svg class="hero-art" viewBox="0 0 240 100" width="230" height="96" aria-hidden="true">'
+    '<rect x="8" y="18" width="204" height="52" rx="16" fill="#ffffff" fill-opacity=".95"/>'
+    '<rect x="8" y="46" width="204" height="8" fill="#13A3AD"/>'
+    + _WIN + '<circle cx="204" cy="62" r="4" fill="#FFD76A"/>' + _WHL +
+    '<line x1="0" y1="86" x2="240" y2="86" stroke="#7FE3E8" stroke-width="3" stroke-linecap="round"/>'
+    '</svg>'
+)
+
+
+def banner(key, title, subtitle, art=False):
     img = PAGE_IMAGES.get(key)
     overlay = "linear-gradient(120deg, rgba(11,37,69,.90) 0%, rgba(14,124,134,.66) 100%)"
     if img:
         bg = "background-image:%s,url('%s');" % (overlay, img)
     else:
         bg = "background-image:linear-gradient(120deg,#0B2545,#0E7C86);"
-    html('<div class="hero" style="%s"><div class="hero-ic">%s</div>'
-         '<div><h2>%s</h2><p>%s</p></div></div>'
-         % (bg, icon(PAGE_ICON[key], 28), title, subtitle))
+    html('<div class="hero%s" style="%s"><div class="hero-ic">%s</div>'
+         '<div><h2>%s</h2><p>%s</p></div>%s</div>'
+         % (" tall" if art else "", bg, icon(PAGE_ICON[key], 28), title, subtitle,
+            TRAIN_ART if art else ""))
 
 
 def stat_grid(items):
@@ -271,25 +285,41 @@ CSS = """
     --shadow: 0 4px 16px rgba(11,37,69,.08);
 }
 
+html, body, .stApp { background: #F5FAFB; }
 .stApp, .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp label,
 .stApp li, .stApp td, .stApp th, .stApp button, .stApp input, .stApp textarea,
 [data-testid="stSidebar"] a {
     font-family: 'Vazirmatn', Tahoma, 'Segoe UI', sans-serif;
 }
-.stApp, [data-testid="stSidebar"], .stMarkdown, label, .stAlert {
+
+/* راست‌چین: فقط برای محتوا (چیدمان کلی صفحه دست نمی‌خورد تا در موبایل به هم نریزد) */
+.block-container, .block-container .stMarkdown, [data-testid="stWidgetLabel"],
+.block-container label, .block-container .stAlert, [data-testid="stSidebarNav"] {
     direction: rtl;
     text-align: right;
 }
+/* در لپ‌تاپ، کل صفحه راست‌به‌چپ است (منو سمت راست) */
+@media (min-width: 769px) {
+    .stApp, [data-testid="stSidebar"] { direction: rtl; }
+}
 .stApp { overflow-x: hidden; }
-.block-container { padding-top: 2rem; max-width: 1200px; }
+.block-container { padding-top: 3rem; max-width: 1200px; }
 
-/* مخفی کردن نوار ابزار، منو، دکمه‌ها و فوتر */
-[data-testid="stToolbar"], [data-testid="stToolbarActions"], [data-testid="stAppDeployButton"],
-[data-testid="stMainMenu"], [data-testid="stDecoration"], [data-testid="stStatusWidget"],
-.stDeployButton, .stAppDeployButton, #MainMenu, footer, [class*="viewerBadge"] {
+/* مخفی کردن گیت‌هاب، ویرایش، منوی سه‌نقطه، Deploy و فوتر (دکمه‌ی منوی کناری مخفی نمی‌شود) */
+[data-testid="stToolbarActions"], [data-testid="stAppDeployButton"], [data-testid="stMainMenu"],
+[data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton, .stAppDeployButton,
+#MainMenu, footer, [class*="viewerBadge"], [data-testid="stHeader"] a[href*="github.com"] {
     display: none !important;
 }
-[data-testid="stHeader"] { background: transparent; }
+[data-testid="stHeader"] { background: rgba(245,250,251,.92); }
+[data-testid="stExpandSidebarButton"], [data-testid="stSidebarCollapsedControl"], [data-testid="collapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+[data-testid="stExpandSidebarButton"] *, [data-testid="stSidebarCollapsedControl"] *, [data-testid="collapsedControl"] * {
+    color: #0B2545 !important;
+}
 
 /* سایدبار */
 [data-testid="stSidebar"] { background: linear-gradient(180deg, #0B2545 0%, #13466B 100%); }
@@ -305,6 +335,11 @@ CSS = """
     color: #7FE3E8 !important;
 }
 
+/* دکمه‌ها (حداقل ۴۴ پیکسل برای لمس راحت) */
+.stButton > button, [data-testid="stFormSubmitButton"] > button {
+    min-height: 44px; border-radius: 12px; font-weight: 600;
+}
+
 /* بنر بالای صفحه */
 .hero {
     display: flex; align-items: center; gap: 1rem;
@@ -312,6 +347,7 @@ CSS = """
     box-shadow: 0 8px 24px rgba(11,37,69,.18);
     background-color: #0B2545; background-size: cover; background-position: center;
 }
+.hero.tall { padding: 2rem 1.8rem; min-height: 170px; }
 .hero-ic {
     flex: 0 0 auto; width: 54px; height: 54px; border-radius: 14px;
     background: rgba(255,255,255,.16); color: #fff;
@@ -319,6 +355,7 @@ CSS = """
 }
 .hero h2 { color: #fff !important; margin: 0 0 .25rem 0; padding: 0; line-height: 1.5; font-size: clamp(1.2rem, 3.2vw, 1.8rem); }
 .hero p { color: #E3F6F7 !important; margin: 0; font-size: clamp(.8rem, 1.8vw, 1rem); }
+.hero-art { margin-inline-start: auto; flex: 0 0 auto; max-width: 40%; height: auto; }
 
 /* کارت‌های آماری */
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; margin: .4rem 0 1rem 0; }
@@ -362,13 +399,17 @@ CSS = """
 
 /* کارت‌های دسترسی سریع */
 [class*="st-key-card_"] {
-    background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 1rem 1.1rem;
+    background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: .9rem;
     box-shadow: var(--shadow);
     transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
 [class*="st-key-card_"]:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(11,37,69,.16); border-color: #0E7C86; }
-.card-title { display: flex; align-items: center; gap: .6rem; font-weight: 800; color: var(--navy); font-size: 1.05rem; margin-bottom: .3rem; }
-.card-title .ic { width: 38px; height: 38px; border-radius: 10px; background: var(--soft); color: var(--teal); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.card-img {
+    height: 96px; border-radius: 12px; margin-bottom: .7rem; color: #fff;
+    background-color: #13466B; background-size: cover; background-position: center;
+    display: flex; align-items: center; justify-content: center;
+}
+.card-title { font-weight: 800; color: var(--navy); font-size: 1.05rem; margin-bottom: .2rem; }
 .card-desc { color: var(--muted); font-size: .88rem; margin-bottom: .4rem; }
 
 /* لیست ایستگاه‌ها */
@@ -393,16 +434,22 @@ table.cal td small { display: block; font-size: .65rem; margin-top: 2px; font-we
 /* نمودار شلوغی: دو نسخه با ارتفاع متفاوت */
 .st-key-chart_mobile { display: none; }
 
+/* منوی میانبر موبایل (فقط در گوشی دیده می‌شود) */
+.st-key-topnav { display: none; }
+
 /* تبلت */
 @media (min-width: 769px) and (max-width: 1100px) {
-    .block-container { padding: 1.5rem 1.5rem 2rem 1.5rem; }
+    .block-container { padding: 3rem 1.5rem 2rem 1.5rem; }
 }
 
 /* موبایل */
 @media (max-width: 768px) {
-    .block-container { padding: 1rem .8rem 2rem .8rem; }
+    .block-container { padding: 4rem .8rem 2rem .8rem; }
+    input, textarea { font-size: 16px !important; }
     .hero { padding: 1rem 1.1rem; border-radius: 14px; gap: .8rem; }
+    .hero.tall { padding: 1.3rem 1.1rem; min-height: 120px; }
     .hero-ic { width: 42px; height: 42px; border-radius: 11px; }
+    .hero-art { display: none; }
     .stat { padding: .7rem .8rem; gap: .6rem; }
     .stat-ic { width: 36px; height: 36px; }
     .stat-v { font-size: .98rem; }
@@ -414,6 +461,17 @@ table.cal td small { display: block; font-size: .65rem; margin-top: 2px; font-we
     table.cal td small { font-size: .5rem; }
     .st-key-chart_desktop { display: none; }
     .st-key-chart_mobile { display: block; }
+
+    .st-key-topnav, .st-key-topnav [data-testid="stVerticalBlock"] {
+        display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
+        overflow-x: auto; gap: .4rem; -webkit-overflow-scrolling: touch;
+    }
+    .st-key-topnav { padding-bottom: .5rem; margin-bottom: .4rem; }
+    .st-key-topnav > div, .st-key-topnav [data-testid="stVerticalBlock"] > div { flex: 0 0 auto !important; width: auto !important; }
+    .st-key-topnav a {
+        white-space: nowrap; background: #fff; border: 1px solid var(--line);
+        border-radius: 999px; padding: .35rem .85rem !important; min-height: 40px;
+    }
 
     /* جایگزین ساده برای مرورگرهایی که :has() را پشتیبانی نمی‌کنند: ستون‌ها زیر هم */
     [data-testid="stHorizontalBlock"] { flex-wrap: wrap; }
@@ -457,7 +515,7 @@ def now_minutes():
 # صفحه ۱: داشبورد
 # ----------------------------------------------------------------------
 def page_dashboard():
-    banner("dashboard", "داشبورد مترو تبریز", "دستیار سفر شما در خط ۱ مترو تبریز")
+    banner("dashboard", "داشبورد مترو تبریز", "دستیار سفر شما در خط ۱ مترو تبریز", art=True)
 
     stat_grid([
         ("train", "ایستگاه‌ها", fa(len(STATIONS))),
@@ -496,8 +554,14 @@ def page_dashboard():
             cols = st.columns(3)
         with cols[i % 3]:
             with st.container(key="card_" + key):
-                html('<div class="card-title"><span class="ic">%s</span>%s</div>'
-                     '<div class="card-desc">%s</div>' % (icon(ic, 20), label, desc))
+                img = PAGE_IMAGES.get(key)
+                ov = "linear-gradient(135deg, rgba(14,124,134,.55), rgba(11,37,69,.70))"
+                if img:
+                    cbg = "background-image:%s,url('%s');" % (ov, img)
+                else:
+                    cbg = "background-image:linear-gradient(135deg,#0E7C86,#0B2545);"
+                html('<div class="card-img" style="%s">%s</div><div class="card-title">%s</div>'
+                     '<div class="card-desc">%s</div>' % (cbg, icon(ic, 30), label, desc))
                 st.page_link(PAGES[key], label="باز کردن", icon=micon)
 
 
@@ -792,5 +856,16 @@ PAGES = {
     "about": st.Page(page_about, title="تماس با ما / درباره", icon=":material/info:", url_path="about"),
 }
 
+def mobile_nav():
+    """نوار میانبر بالای صفحه؛ فقط در گوشی نمایش داده می‌شود."""
+    items = [("dashboard", "داشبورد", ":material/home:"), ("trip", "سفر", ":material/schedule:"),
+             ("map", "نقشه", ":material/map:"), ("calendar", "تقویم", ":material/calendar_month:"),
+             ("crowd", "شلوغی", ":material/bar_chart:"), ("about", "درباره", ":material/info:")]
+    with st.container(key="topnav"):
+        for key, label, micon in items:
+            st.page_link(PAGES[key], label=label, icon=micon)
+
+
 pg = st.navigation(list(PAGES.values()))
+mobile_nav()
 pg.run()
